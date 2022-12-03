@@ -1,0 +1,72 @@
+name: cpp-cmake-mingw-prebuilt-release-actions-workflow
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+      - 'c*'
+
+jobs:
+  build:
+    name: Create Release
+    runs-on: windows-2019
+    env:
+      libraryName: libopencm3
+      installationPath: libopencm3-installation
+      tagName: v0.8.0 # target tag
+      targetZip: libopencm3-${{ github.ref_name }}-gcc-arm-embedded.zip
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: git clone
+        shell: cmd
+        run: git clone --recursive https://github.com/libopencm3/libopencm3.git && cd libopencm3 && git checkout ${{ env.tagName }}
+      
+      - name: Install MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          install: make autoconf automake libtool autogen perl
+          
+      - name: curl python-2.7.13-amd64-portable.zip
+        shell: cmd
+        run: |
+          curl https://github.com/dirkarnez/python-portable/releases/download/v2.7.13/python-2.7.13-amd64-portable.zip -L --output python-2.7.13-amd64-portable.zip &&^
+          dir &&^
+          7z.exe x python-2.7.13-amd64-portable.zip -o"python-2.7.13-amd64-portable"
+          
+      
+      - name: curl cmake-3.24.0-windows-x86_64.zip
+        shell: cmd
+        run: | 
+          curl https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu/11.3.rel1/binrel/arm-gnu-toolchain-11.3.rel1-mingw-w64-i686-arm-none-eabi.zip -L --output arm-gnu-toolchain-11.3.rel1-mingw-w64-i686-arm-none-eabi.zip &&^
+          dir &&^
+          7z.exe x arm-gnu-toolchain-11.3.rel1-mingw-w64-i686-arm-none-eabi.zip
+      
+      - name: set PATH, check mingw version, cmake generate, build and install
+        shell: msys2 {0}
+        run: |
+            export workspace=$(pwd) && \
+            export PATH="$workspace/arm-gnu-toolchain-11.3.rel1-mingw-w64-i686-arm-none-eabi/bin:$workspace/msys64/usr/bin:/usr/local/bin:/usr/bin:/bin" && \
+            export PATH="$workspace/python-2.7.13-amd64-portable:$PATH" && \
+            cd libopencm3 && \
+            g++ --version && \
+            make.exe V=1
+            
+#      - name: copy customized openssl-config.cmake
+#        shell: cmd
+#        run: cd /d "${{github.workspace}}" && xcopy /H /Y /C "openssl-config.cmake" "openssl\${{ env.installationPath }}"
+        
+      - name: Archive Release
+        uses: thedoctor0/zip-release@master
+        with:
+          type: 'zip'
+          directory: "libopencm3"
+          filename: "${{ env.targetZip }}"
+        
+      - name: Release prebuilt
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "libopencm3/${{ env.targetZip }}"
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
