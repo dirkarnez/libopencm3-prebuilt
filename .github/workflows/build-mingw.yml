@@ -16,8 +16,6 @@ jobs:
       tagName: v0.8.0 # target tag
       targetZip: libopencm3-${{ github.ref_name }}-gcc-arm-embedded.zip
     steps:
-      - uses: actions/checkout@v3
-      
       - name: git clone
         shell: cmd
         run: git clone --recursive https://github.com/libopencm3/libopencm3.git && cd libopencm3 && git checkout ${{ env.tagName }}
@@ -34,9 +32,8 @@ jobs:
           curl https://github.com/dirkarnez/python-portable/releases/download/v2.7.13/python-2.7.13-amd64-portable.zip -L --output python-2.7.13-amd64-portable.zip &&^
           dir &&^
           7z.exe x python-2.7.13-amd64-portable.zip -o"python-2.7.13-amd64-portable"
-          
-      
-      - name: curl cmake-3.24.0-windows-x86_64.zip
+
+      - name: curl arm-gnu-toolchain-11.3.rel1-mingw-w64-i686-arm-none-eabi.zip
         shell: cmd
         run: | 
           curl https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu/11.3.rel1/binrel/arm-gnu-toolchain-11.3.rel1-mingw-w64-i686-arm-none-eabi.zip -L --output arm-gnu-toolchain-11.3.rel1-mingw-w64-i686-arm-none-eabi.zip &&^
