@@ -47,7 +47,6 @@ jobs:
             export PATH="$workspace/arm-gnu-toolchain-11.3.rel1-mingw-w64-i686-arm-none-eabi/bin:$workspace/msys64/usr/bin:/usr/local/bin:/usr/bin:/bin" && \
             export PATH="$workspace/python-2.7.13-amd64-portable:$PATH" && \
             cd libopencm3 && \
-            g++ --version && \
             make.exe V=1
             
 #      - name: copy customized openssl-config.cmake
