@@ -38,7 +38,7 @@ jobs:
         run: | 
           curl https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu/11.3.rel1/binrel/arm-gnu-toolchain-11.3.rel1-mingw-w64-i686-arm-none-eabi.zip -L --output arm-gnu-toolchain-11.3.rel1-mingw-w64-i686-arm-none-eabi.zip &&^
           dir &&^
-          7z.exe x arm-gnu-toolchain-11.3.rel1-mingw-w64-i686-arm-none-eabi.zip
+          7z.exe x arm-gnu-toolchain-11.3.rel1-mingw-w64-i686-arm-none-eabi.zip -aoa
       
       - name: set PATH, check mingw version, cmake generate, build and install
         shell: msys2 {0}
